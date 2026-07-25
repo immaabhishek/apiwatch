@@ -1,48 +1,79 @@
 # APIWatch
 
-APIWatch is a full-stack API monitoring platform that helps developers monitor API uptime, response time, failures, and receive alerts when services go down.
+APIWatch is a full-stack API monitoring application built with React, Node.js, Express, and MongoDB. It allows users to monitor REST APIs, track response times, view uptime statistics, and receive email notifications whenever an API becomes unavailable.
+
+The project was built to understand backend development concepts such as authentication, scheduled background jobs, REST API design, and database integration while also creating a responsive frontend dashboard.
+
+---
 
 ## Features
 
+### Authentication
 - User registration and login
 - JWT-based authentication
-- Add API monitors
-- View all monitors
-- Delete monitors
-- Manual API health check
-- Automatic API checking every minute
-- API status tracking: UP, DOWN, UNKNOWN
-- Response time tracking
-- Check history storage
-- Dashboard summary
-- Email alert when API goes DOWN
-- React frontend dashboard
+- Password hashing using bcryptjs
+- Protected routes
+
+### API Monitoring
+- Create API monitors
+- Support for GET, POST, PUT, and DELETE requests
+- Manual API health checks
+- Automatic monitoring using Cron Jobs (runs every minute)
+- Custom expected HTTP status codes
+
+### Dashboard
+- View all monitored APIs
+- Current API status (UP / DOWN)
+- Total monitors
+- Total health checks
+- Average response time
+- Overall uptime percentage
+
+### Monitoring History
+- Response time history
+- Status code history
+- Last checked timestamp
+- Historical monitoring records
+
+### Email Notifications
+- Email alerts when an API changes from UP to DOWN
+- Prevents duplicate notifications while an API remains unavailable
+
+---
 
 ## Tech Stack
 
 ### Frontend
-
 - React
 - Vite
-- CSS
+- CSS3
 
 ### Backend
-
 - Node.js
 - Express.js
+
+### Database
 - MongoDB
 - Mongoose
-- JWT
+
+### Authentication
+- JSON Web Token (JWT)
 - bcryptjs
+
+### Monitoring & Utilities
 - Axios
-- Node-cron
+- Node Cron
 - Nodemailer
+- dotenv
 - CORS
 
-## Project Structure
+---
 
-```txt
+## Folder Structure
+
+```text
 apiwatch/
+│
 ├── backend/
 │   ├── config/
 │   ├── models/
@@ -50,83 +81,162 @@ apiwatch/
 │   ├── package.json
 │   └── .env
 │
-└── frontend/
-    ├── src/
-    ├── package.json
-    └── index.html
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   └── vite.config.js
+│
+└── README.md
 ```
 
-## Backend Setup
+---
+
+## Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/immaabhishek/APIWatch.git
+cd apiwatch
+```
+
+### 2. Install backend dependencies
 
 ```bash
 cd backend
 npm install
-npm run dev
 ```
 
-Backend runs on:
-
-```txt
-http://localhost:5000
-```
-
-## Frontend Setup
+### 3. Install frontend dependencies
 
 ```bash
-cd frontend
+cd ../frontend
 npm install
-npm run dev
 ```
 
-Frontend runs on:
-
-```txt
-http://localhost:5173
-```
+---
 
 ## Environment Variables
 
-Create a `.env` file inside the backend folder:
+Create a `.env` file inside the `backend` directory.
 
 ```env
 PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/apiwatch
-JWT_SECRET=your_jwt_secret
+
+MONGO_URI=your_mongodb_connection_string
+
+JWT_SECRET=your_secret_key
+
 EMAIL_USER=your_email@gmail.com
+
 EMAIL_PASS=your_gmail_app_password
 ```
 
+---
+
+## Running the Project
+
+### Start Backend
+
+```bash
+cd backend
+npm run dev
+```
+
+### Start Frontend
+
+```bash
+cd frontend
+npm run dev
+```
+
+Frontend:
+
+```
+http://localhost:5173
+```
+
+Backend:
+
+```
+http://localhost:5000
+```
+
+---
+
 ## API Endpoints
 
-### Auth
+### Authentication
 
-```txt
-POST /api/auth/register
-POST /api/auth/login
-GET  /api/auth/me
-```
+| Method | Endpoint |
+|---------|----------|
+| POST | `/api/auth/register` |
+| POST | `/api/auth/login` |
+| GET | `/api/auth/me` |
 
 ### Monitors
 
-```txt
-POST   /api/monitors
-GET    /api/monitors
-DELETE /api/monitors/:id
-POST   /api/monitors/:id/check
-GET    /api/monitors/:id/history
-GET    /api/monitors/:id/stats
-```
+| Method | Endpoint |
+|---------|----------|
+| POST | `/api/monitors` |
+| GET | `/api/monitors` |
+| DELETE | `/api/monitors/:id` |
+| POST | `/api/monitors/:id/check` |
 
-### Dashboard
+### Analytics
 
-```txt
-GET /api/dashboard/summary
-```
+| Method | Endpoint |
+|---------|----------|
+| GET | `/api/monitors/:id/history` |
+| GET | `/api/monitors/:id/stats` |
+| GET | `/api/dashboard/summary` |
 
-## Resume Description
+---
 
-Built APIWatch, a full-stack API monitoring platform using React, Node.js, Express.js, MongoDB, JWT, Axios, Node-cron, and Nodemailer. The platform allows users to monitor API uptime, response time, failures, and receive automated email alerts when services go down.
+## How It Works
 
-## Resume Bullet
+1. A user creates an account and logs in.
+2. The user adds an API endpoint to monitor.
+3. APIWatch periodically checks the endpoint using Axios.
+4. Each check stores the response time, HTTP status code, and current status.
+5. If an API becomes unavailable, an email notification is sent.
+6. Monitoring history and statistics are available through the dashboard.
 
-- Developed APIWatch, a full-stack API monitoring SaaS platform with JWT authentication, API health checks, auto-monitoring using node-cron, email alerts using Nodemailer, and a React dashboard for uptime and response-time analytics.
+---
+
+## Future Improvements
+
+Some features that can be added in future versions:
+
+- Docker support
+- Deployment using Render or Railway
+- Charts for response time trends
+- Slack and Discord notifications
+- Custom monitoring intervals
+- Team workspaces
+- Role-based access control
+- Dark mode
+
+---
+
+## Learning Outcomes
+
+While building this project, I gained practical experience with:
+
+- Building REST APIs using Express.js
+- JWT authentication and route protection
+- Password hashing with bcryptjs
+- MongoDB schema design using Mongoose
+- Scheduled background jobs using node-cron
+- Email notifications using Nodemailer
+- React state management and API integration
+- Measuring API response times using Axios
+
+---
+
+## Author
+
+**Abhishek Kumar**
+
+If you have suggestions or feedback, feel free to open an issue or submit a pull request.
