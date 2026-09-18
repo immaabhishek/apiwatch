@@ -420,8 +420,63 @@ function App() {
         </div>
       )}
 
-      {page === "dashboard" && (
-        <div className="dashboard">
+{page === "dashboard" && (
+  <div className="dashboard-layout">
+
+    <aside className="sidebar">
+
+      <h2 className="sidebar-logo">APIWatch</h2>
+
+      <nav className="sidebar-nav">
+
+        <button
+          className="sidebar-link active"
+          onClick={() => setPage("dashboard")}
+        >
+          <span>▦</span>
+          Dashboard
+        </button>
+
+        <button
+          className="sidebar-link"
+          onClick={() => setMessage("Monitor management is available below.")}
+        >
+          <span>◉</span>
+          Monitors
+        </button>
+
+        <button
+          className="sidebar-link"
+          onClick={() => setMessage("Analytics section coming soon.")}
+        >
+          <span>▥</span>
+          Analytics
+        </button>
+
+            </nav>
+
+      <div className="sidebar-bottom">
+
+        <button
+          className="sidebar-link"
+          onClick={() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setSummary(null);
+            setMonitors([]);
+            setMessage("");
+            setPage("home");
+          }}
+        >
+          <span>↪</span>
+          Logout
+        </button>
+
+      </div>
+
+    </aside>
+
+    <div className="dashboard">
           <h1>Dashboard</h1>
           <p>You are logged in successfully.</p>
 
@@ -596,7 +651,8 @@ function App() {
           >
             Logout
           </button>
-        </div>
+                </div>
+      </div>
       )}
     </div>
   );
