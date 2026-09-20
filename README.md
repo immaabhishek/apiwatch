@@ -1,89 +1,60 @@
-# APIWatch
+# 📡 APIWatch — Full-Stack API Monitoring Platform
 
-APIWatch is a full-stack API monitoring application built with React, Node.js, Express, and MongoDB. It allows users to monitor REST APIs, track response times, view uptime statistics, and receive email notifications whenever an API becomes unavailable.
-
-The project was built to understand backend development concepts such as authentication, scheduled background jobs, REST API design, and database integration while also creating a responsive frontend dashboard.
+APIWatch is a lightweight, real-time API uptime & performance monitoring tool. I built this project to monitor REST endpoints, track response latencies, receive automated email alerts when services go down, and visualize metrics on a clean dashboard.
 
 ---
 
-## Features
+## 💡 Why I Built This
 
-### Authentication
-- User registration and login
-- JWT-based authentication
-- Password hashing using bcryptjs
-- Protected routes
-
-### API Monitoring
-- Create API monitors
-- Support for GET, POST, PUT, and DELETE requests
-- Manual API health checks
-- Automatic monitoring using Cron Jobs (runs every minute)
-- Custom expected HTTP status codes
-
-### Dashboard
-- View all monitored APIs
-- Current API status (UP / DOWN)
-- Total monitors
-- Total health checks
-- Average response time
-- Overall uptime percentage
-
-### Monitoring History
-- Response time history
-- Status code history
-- Last checked timestamp
-- Historical monitoring records
-
-### Email Notifications
-- Email alerts when an API changes from UP to DOWN
-- Prevents duplicate notifications while an API remains unavailable
+I wanted to understand how tools like UptimeRobot or Pingdom work under the hood. Specifically, I wanted hands-on experience with:
+- **Background Cron Jobs**: Scheduling automated health checks in Node.js without blocking the main event loop.
+- **Database Integration**: Storing time-series health check results in MongoDB and connecting a production Node.js backend to **MongoDB Atlas**.
+- **Real-time Alerting**: Triggering automated email notifications via SMTP (Nodemailer) when a service state changes from `UP` to `DOWN`.
+- **JWT Authentication**: Protecting monitoring routes and user dashboards.
 
 ---
 
-## Tech Stack
+## ✨ Key Features
 
-### Frontend
-- React
-- Vite
-- CSS3
-
-### Backend
-- Node.js
-- Express.js
-
-### Database
-- MongoDB
-- Mongoose
-
-### Authentication
-- JSON Web Token (JWT)
-- bcryptjs
-
-### Monitoring & Utilities
-- Axios
-- Node Cron
-- Nodemailer
-- dotenv
-- CORS
+- **🛡️ JWT Authentication & Security**: Register, login, and secure API routes with hashed passwords (`bcryptjs`).
+- **⏱️ Automated Health Checks**: Background worker powered by `node-cron` pings registered APIs every minute.
+- **📊 Real-Time Analytics**: Monitor response time (ms), status codes (200, 404, 500, etc.), overall uptime percentage, and total health checks.
+- **📧 Email Alerts**: Immediate email notifications sent via Nodemailer if an API goes down.
+- **☁️ Cloud & Production Ready**: Seamlessly connects to MongoDB Atlas and deploys easily on Render or Railway.
 
 ---
 
-## Folder Structure
+## 🛠️ Tech Stack
+
+- **Frontend**: React, Vite, Modern CSS3
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB Atlas, Mongoose
+- **Scheduler**: Node-Cron
+- **Alerting**: Nodemailer (Gmail SMTP)
+- **Auth**: JSON Web Tokens (JWT), bcryptjs
+
+---
+
+## 📁 Project Structure
 
 ```text
 apiwatch/
-│
 ├── backend/
 │   ├── config/
+│   │   └── db.js            # MongoDB Mongoose connection handler
 │   ├── models/
-│   ├── server.js
-│   ├── package.json
-│   └── .env
+│   │   ├── User.js          # User schema
+│   │   ├── Monitor.js       # Target API schema
+│   │   └── CheckResult.js   # Historical logs schema
+│   ├── server.js            # Express server, routes & cron job
+│   ├── test-db.js           # CLI database connection tester
+│   └── .env                 # Environment variables
 │
 ├── frontend/
-│   ├── public/
 │   ├── src/
+│   │   ├── App.jsx          # Main React App & dashboard views
+│   │   ├── App.css          # Modern dark-themed design system
+│   │   └── main.jsx
 │   ├── package.json
 │   └── vite.config.js
 │
@@ -92,151 +63,74 @@ apiwatch/
 
 ---
 
-## Installation
+## 🚀 Quick Start Guide
 
 ### 1. Clone the repository
-
 ```bash
-git clone https://github.com/immaabhishek/APIWatch.git
+git clone https://github.com/immaabhishek/apiwatch.git
 cd apiwatch
 ```
 
-### 2. Install backend dependencies
-
-```bash
-cd backend
-npm install
-```
-
-### 3. Install frontend dependencies
-
-```bash
-cd ../frontend
-npm install
-```
-
----
-
-## Environment Variables
-
-Create a `.env` file inside the `backend` directory.
+### 2. Configure Backend Environment
+Navigate to `backend` and create a `.env` file:
 
 ```env
 PORT=5000
-
-MONGO_URI=your_mongodb_connection_string
-
-JWT_SECRET=your_secret_key
-
-EMAIL_USER=your_email@gmail.com
-
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxxx.mongodb.net/apiwatch?retryWrites=true&w=majority
+JWT_SECRET=your_super_secret_jwt_key
+EMAIL_USER=your_gmail@gmail.com
 EMAIL_PASS=your_gmail_app_password
 ```
 
----
+> **Tip:** You can test your MongoDB connection string at any time by running `npm run test-db` inside the `backend` folder!
 
-## Running the Project
-
-### Start Backend
-
+### 3. Start Backend Server
 ```bash
 cd backend
+npm install
 npm run dev
 ```
+*Backend runs on `http://localhost:5000`*
 
-### Start Frontend
-
+### 4. Start Frontend Client
+In a new terminal window:
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
-
-Frontend:
-
-```
-http://localhost:5173
-```
-
-Backend:
-
-```
-http://localhost:5000
-```
+*Frontend runs on `http://localhost:5173`*
 
 ---
 
-## API Endpoints
+## 🔌 API Endpoints
 
-### Authentication
+### 🔐 Auth Routes
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Create a new user account |
+| `POST` | `/api/auth/login` | Authenticate user & receive JWT |
+| `GET` | `/api/auth/me` | Fetch logged-in user info |
 
-| Method | Endpoint |
-|---------|----------|
-| POST | `/api/auth/register` |
-| POST | `/api/auth/login` |
-| GET | `/api/auth/me` |
+### 🎯 Monitor Routes *(Protected)*
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/monitors` | List all user monitors |
+| `POST` | `/api/monitors` | Create a new API monitor |
+| `POST` | `/api/monitors/:id/check` | Trigger an immediate manual health check |
+| `DELETE` | `/api/monitors/:id` | Remove a monitor |
 
-### Monitors
-
-| Method | Endpoint |
-|---------|----------|
-| POST | `/api/monitors` |
-| GET | `/api/monitors` |
-| DELETE | `/api/monitors/:id` |
-| POST | `/api/monitors/:id/check` |
-
-### Analytics
-
-| Method | Endpoint |
-|---------|----------|
-| GET | `/api/monitors/:id/history` |
-| GET | `/api/monitors/:id/stats` |
-| GET | `/api/dashboard/summary` |
+### 📈 Analytics Routes *(Protected)*
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/dashboard/summary` | Get aggregated uptime %, avg response time, & monitor stats |
+| `GET` | `/api/monitors/:id/history` | Get full ping history for a specific monitor |
+| `GET` | `/api/monitors/:id/stats` | Get detailed stats for a specific monitor |
 
 ---
 
-## How It Works
+## 🤝 Contributing & Feedback
 
-1. A user creates an account and logs in.
-2. The user adds an API endpoint to monitor.
-3. APIWatch periodically checks the endpoint using Axios.
-4. Each check stores the response time, HTTP status code, and current status.
-5. If an API becomes unavailable, an email notification is sent.
-6. Monitoring history and statistics are available through the dashboard.
+Suggestions, bug reports, and pull requests are always welcome! Feel free to open an issue or submit a PR.
 
----
-
-## Future Improvements
-
-Some features that can be added in future versions:
-
-- Docker support
-- Deployment using Render or Railway
-- Charts for response time trends
-- Slack and Discord notifications
-- Custom monitoring intervals
-- Team workspaces
-- Role-based access control
-- Dark mode
-
----
-
-## Learning Outcomes
-
-While building this project, I gained practical experience with:
-
-- Building REST APIs using Express.js
-- JWT authentication and route protection
-- Password hashing with bcryptjs
-- MongoDB schema design using Mongoose
-- Scheduled background jobs using node-cron
-- Email notifications using Nodemailer
-- React state management and API integration
-- Measuring API response times using Axios
-
----
-
-## Author
-
-**Abhishek Kumar**
-
-If you have suggestions or feedback, feel free to open an issue or submit a pull request.
+**Author:** [Abhishek Kumar](https://github.com/immaabhishek)
