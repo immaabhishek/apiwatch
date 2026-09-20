@@ -4,7 +4,7 @@ APIWatch is a lightweight, real-time API uptime & performance monitoring tool. I
 
 ---
 
-## 💡 Why I Built This
+## Why I Built This
 
 I wanted to understand how tools like UptimeRobot or Pingdom work under the hood. Specifically, I wanted hands-on experience with:
 - **Background Cron Jobs**: Scheduling automated health checks in Node.js without blocking the main event loop.
@@ -35,7 +35,7 @@ I wanted to understand how tools like UptimeRobot or Pingdom work under the hood
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 apiwatch/
@@ -63,7 +63,7 @@ apiwatch/
 
 ---
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### 1. Clone the repository
 ```bash
@@ -105,14 +105,14 @@ npm run dev
 
 ## 🔌 API Endpoints
 
-### 🔐 Auth Routes
+### Auth Routes
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | `POST` | `/api/auth/register` | Create a new user account |
 | `POST` | `/api/auth/login` | Authenticate user & receive JWT |
 | `GET` | `/api/auth/me` | Fetch logged-in user info |
 
-### 🎯 Monitor Routes *(Protected)*
+### Monitor Routes *(Protected)*
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | `GET` | `/api/monitors` | List all user monitors |
@@ -129,7 +129,7 @@ npm run dev
 
 ---
 
-## 🤝 Contributing & Feedback
+## Contributing & Feedback
 
 Suggestions, bug reports, and pull requests are always welcome! Feel free to open an issue or submit a PR.
 
