@@ -477,39 +477,79 @@ function App() {
     </aside>
 
     <div className="dashboard">
+      <div className="dashboard-header">
+        <div className="dashboard-heading">
+          <span className="dashboard-eyebrow">OVERVIEW</span>
+
           <h1>Dashboard</h1>
-          <p>You are logged in successfully.</p>
+
+          <p>
+            Monitor your APIs and track their health in real time.
+          </p>
+        </div>
+
+        <button
+          className="btn primary dashboard-refresh"
+          onClick={refreshDashboard}
+        >
+          ↻ Refresh
+          </button>
+        </div>
 
           {summary ? (
             <div className="stats-grid">
-              <div className="stat-card">
-                <h3>Total Monitors</h3>
-                <p>{summary.totalMonitors}</p>
+              <div className="stat-card stat-total">
+                <div className="stat-card-header">
+                  <h3>Total Monitors</h3>
+                  <span className="stat-icon">◎</span>
+                </div>
+                <p className="stat-value">{summary.totalMonitors}</p>
+                <span className="stat-note">Configured APIs</span>
               </div>
 
-              <div className="stat-card">
-                <h3>UP Monitors</h3>
-                <p>{summary.upMonitors}</p>
+              <div className="stat-card stat-up">
+                <div className="stat-card-header">
+                  <h3>UP Monitors</h3>
+                  <span className="stat-icon">✓</span>
+                </div>
+                <p className="stat-value">{summary.upMonitors}</p>
+                <span className="stat-note">Working normally</span>
               </div>
 
-              <div className="stat-card">
-                <h3>DOWN Monitors</h3>
-                <p>{summary.downMonitors}</p>
+              <div className="stat-card stat-down">
+                <div className="stat-card-header">
+                  <h3>DOWN Monitors</h3>
+                  <span className="stat-icon">!</span>
+                </div>
+                <p className="stat-value">{summary.downMonitors}</p>
+                <span className="stat-note">Need attention</span>
               </div>
 
-              <div className="stat-card">
-                <h3>Total Checks</h3>
-                <p>{summary.totalChecks}</p>
+              <div className="stat-card stat-checks">
+                <div className="stat-card-header">
+                  <h3>Total Checks</h3>
+                  <span className="stat-icon">↻</span>
+                </div>
+                <p className="stat-value">{summary.totalChecks}</p>
+                <span className="stat-note">Checks performed</span>
               </div>
 
-              <div className="stat-card">
-                <h3>Uptime</h3>
-                <p>{summary.uptimePercentage}%</p>
+              <div className="stat-card stat-uptime">
+                <div className="stat-card-header">
+                  <h3>Uptime</h3>
+                  <span className="stat-icon">%</span>
+                </div>
+                <p className="stat-value">{summary.uptimePercentage}%</p>
+                <span className="stat-note">Overall availability</span>
               </div>
 
-              <div className="stat-card">
-                <h3>Avg Response</h3>
-                <p>{summary.averageResponseTime} ms</p>
+              <div className="stat-card stat-response">
+                <div className="stat-card-header">
+                  <h3>Avg Response</h3>
+                  <span className="stat-icon">ϟ</span>
+                </div>
+                <p className="stat-value">{summary.averageResponseTime} ms</p>
+                <span className="stat-note">Response duration</span>
               </div>
             </div>
           ) : (
@@ -634,9 +674,6 @@ function App() {
             )}
           </div>
 
-          <button className="btn primary" onClick={refreshDashboard}>
-            Refresh Dashboard
-          </button>
 
           <button
             className="btn secondary"
