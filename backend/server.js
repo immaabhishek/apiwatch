@@ -2,7 +2,10 @@ const express = require("express");
 const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const axios = require("axios");
+const {
+  validateMonitorUrl,
+  safeAxiosRequest,
+} = require("./utils/ssrfProtection");
 const cron = require("node-cron");
 const nodemailer = require("nodemailer");
 const cors = require("cors");
@@ -56,12 +59,12 @@ const protect = async (req, res, next) => {
   }
 };
 
-// Home route
+
 app.get("/", (req, res) => {
   res.send("APIWatch backend is running with MongoDB");
 });
 
-// Health route
+
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
@@ -70,7 +73,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Register API
+
 app.post("/api/auth/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -117,7 +120,7 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
-// Login API
+
 app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -170,7 +173,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-// Get logged in user
+
 app.get("/api/auth/me", protect, async (req, res) => {
   res.status(200).json({
     success: true,
@@ -179,23 +182,54 @@ app.get("/api/auth/me", protect, async (req, res) => {
   });
 });
 
-// Create monitor
 app.post("/api/monitors", protect, async (req, res) => {
   try {
     const { name, url, method, expectedStatus } = req.body;
 
-    if (!name || !url) {
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      typeof url !== "string" ||
+      !url.trim()
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Name and URL are required",
+        message: "Valid name and URL are required",
+      });
+    }
+
+    if (method !== undefined && typeof method !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid HTTP method",
+      });
+    }
+
+    const normalizedMethod = (method || "GET").toUpperCase();
+
+    if (!["GET", "HEAD"].includes(normalizedMethod)) {
+      return res.status(400).json({
+        success: false,
+        message: "Only GET and HEAD methods are allowed",
+      });
+    }
+
+    let safeUrl;
+
+    try {
+      safeUrl = await validateMonitorUrl(url);
+    } catch (validationError) {
+      return res.status(400).json({
+        success: false,
+        message: validationError.message,
       });
     }
 
     const monitor = await Monitor.create({
       user: req.user._id,
-      name,
-      url,
-      method: method || "GET",
+      name: name.trim(),
+      url: safeUrl,
+      method: normalizedMethod,
       expectedStatus: expectedStatus || 200,
     });
 
@@ -213,7 +247,7 @@ app.post("/api/monitors", protect, async (req, res) => {
   }
 });
 
-// Get monitors
+
 app.get("/api/monitors", protect, async (req, res) => {
   try {
     const monitors = await Monitor.find({ user: req.user._id }).sort({
@@ -235,7 +269,7 @@ app.get("/api/monitors", protect, async (req, res) => {
   }
 });
 
-// Delete monitor
+
 app.delete("/api/monitors/:id", protect, async (req, res) => {
   try {
     const monitor = await Monitor.findById(req.params.id);
@@ -269,7 +303,7 @@ app.delete("/api/monitors/:id", protect, async (req, res) => {
   }
 });
 
-// Manual check monitor
+
 app.post("/api/monitors/:id/check", protect, async (req, res) => {
   try {
     const monitor = await Monitor.findById(req.params.id);
@@ -292,11 +326,10 @@ app.post("/api/monitors/:id/check", protect, async (req, res) => {
 
     const startTime = Date.now();
 
-    const response = await axios({
+    const response = await safeAxiosRequest({
       method: monitor.method,
       url: monitor.url,
       timeout: 10000,
-      validateStatus: () => true,
     });
 
     const endTime = Date.now();
@@ -381,7 +414,7 @@ app.post("/api/monitors/:id/check", protect, async (req, res) => {
   }
 });
 
-// Monitor history
+
 app.get("/api/monitors/:id/history", protect, async (req, res) => {
   try {
     const monitor = await Monitor.findById(req.params.id);
@@ -420,7 +453,7 @@ app.get("/api/monitors/:id/history", protect, async (req, res) => {
   }
 });
 
-// Monitor stats
+
 app.get("/api/monitors/:id/stats", protect, async (req, res) => {
   try {
     const monitor = await Monitor.findById(req.params.id);
@@ -495,7 +528,7 @@ app.get("/api/monitors/:id/stats", protect, async (req, res) => {
   }
 });
 
-// Dashboard summary
+
 app.get("/api/dashboard/summary", protect, async (req, res) => {
   try {
     const monitors = await Monitor.find({ user: req.user._id });
@@ -561,7 +594,7 @@ app.get("/api/dashboard/summary", protect, async (req, res) => {
   }
 });
 
-// Email alert function
+
 const sendDownAlertEmail = async (userEmail, monitor, errorMessage) => {
   try {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -604,18 +637,17 @@ const sendDownAlertEmail = async (userEmail, monitor, errorMessage) => {
   }
 };
 
-// Auto check single monitor
+
 const checkSingleMonitor = async (monitor) => {
   try {
     const previousStatus = monitor.status;
 
     const startTime = Date.now();
 
-    const response = await axios({
+    const response = await safeAxiosRequest({
       method: monitor.method,
       url: monitor.url,
       timeout: 10000,
-      validateStatus: () => true,
     });
 
     const endTime = Date.now();
@@ -677,7 +709,7 @@ const checkSingleMonitor = async (monitor) => {
   }
 };
 
-// Cron job - runs every minute
+
 cron.schedule("* * * * *", async () => {
   try {
     console.log("Auto monitor check started...");
